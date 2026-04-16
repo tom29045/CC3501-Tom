@@ -19,9 +19,7 @@ from collections import deque
 class Controller(Window):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
-        self.width = 600
-        self.height = 600
+        
         self.time = 0
 
         # Declare sus variables globales aquí
@@ -66,17 +64,16 @@ if __name__ == "__main__":
     #version 330
     in vec2 position; 
     in vec3 color;
-    in float ttl;
-    in float max_ttl;    
+    in float ttl;    
 
     out vec3 fragColor; 
     out float alpha;
 
     void main() {
-        gl_PointSize = 10.0 * (ttl / 3.0);
+        gl_PointSize = 25.0 * (ttl / 3.0);
         gl_Position = vec4(position, 0.0, 1.0); 
         fragColor = color;
-        alpha = ttl / max_ttl;
+        alpha = ttl / 3.0;
     }
     """
 
@@ -99,7 +96,7 @@ if __name__ == "__main__":
     
     void main() 
     {
-        outColor = vec4(1.0, 1.0, 0.0, alpha);
+        outColor = vec4(fragColor, alpha);
     }
     """
 
@@ -137,11 +134,12 @@ if __name__ == "__main__":
         0.8, -0.6 # Ver 3
     ]
 
-    color_bala_grande = [1.0, 0.0, 1.0]
-    color_bala_pequena = [0.0, 1.0, 1.0]
+    color_bala_grande = [0.2, 0.6, 1.0]
+    color_bala_pequena = [0.5, 0.2, 1.0]
     gpu_canon_der = pipeline.vertex_list_indexed(4, GL_TRIANGLES, indices_canon)
     gpu_canon_der.position = pos_vertices_der
     gpu_canon_der.color = colores_canones
+
 
     @controller.event
     def on_draw():
@@ -172,14 +170,14 @@ if __name__ == "__main__":
     def on_key_press(symbol, modifiers):
         if symbol == key.A:
             v_x = np.random.uniform(2.0, 3.0)
-            v_y = np.random.uniform(1.0, 2.0)
-            p_pequena = Particle([-0.8, -0.7], 5.0, [v_x, v_y], [0.0 ,-2.0])
+            v_y = np.random.uniform(2.0, 3.0)
+            p_pequena = Particle([-0.8, -0.7], 1.5, [v_x, v_y], [0.0 ,-2.0])
             controller.particles_peq.append(p_pequena)
 
         if symbol == key.D:
-            v_x = np.random.uniform(-3.0, -2.0)
-            v_y = np.random.uniform(0.9, 2.0)
-            p_grande = Particle([0.8, -0.7], 10.0, [v_x, v_y], [0.0 ,-4.0])
+            v_x = np.random.uniform(-2.5, -1.5)
+            v_y = np.random.uniform(1.0, 2.0)
+            p_grande = Particle([0.8, -0.7], 3.0, [v_x, v_y], [0.0 ,-4.0])
             controller.particles_gran.append(p_grande)
 
 
@@ -201,6 +199,7 @@ if __name__ == "__main__":
             controller.particles_peq_gpu_object = None
         if len(controller.particles_peq) > 0:
             controller.particles_peq_gpu_object = pipeline_special.vertex_list(len(controller.particles_peq), GL_POINTS)
+            controller.particles_peq_gpu_object.color = color_bala_pequena * len(controller.particles_peq)
             pos = []
             ttls = []
             for p in controller.particles_peq:
@@ -220,6 +219,7 @@ if __name__ == "__main__":
             controller.particles_gran_gpu_object = None
         if len(controller.particles_gran) > 0:
             controller.particles_gran_gpu_object = pipeline_special.vertex_list(len(controller.particles_gran), GL_POINTS)
+            controller.particles_gran_gpu_object.color = color_bala_grande * len(controller.particles_gran)
             pos = []
             ttls = []
             for p in controller.particles_gran:
