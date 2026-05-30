@@ -52,6 +52,7 @@ class Particle():
     # Puede definir más métodos si lo estima conveniente :D
     def alive(self):
         return bool(self.ttl > 0)
+        
 
 
 
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     out float alpha;
 
     void main() {
-        gl_PointSize = 25.0 * (ttl / 3.0);
+        gl_PointSize = 40.0 * (ttl / 3.0);
         gl_Position = vec4(position, 0.0, 1.0); 
         fragColor = color;
         alpha = ttl / 3.0;
@@ -120,9 +121,9 @@ if __name__ == "__main__":
     ]
     colores_canones = [
         1.0, 0.2, 0.2, # Ver 0
-        1.0, 0.2, 0.2, # Ver 1
+        1.0, 0.2, 0.4, # Ver 1
         1.0, 0.2, 0.2, # Ver 2
-        1.0, 0.2, 0.2 # Ver 3
+        1.0, 0.2, 0.4 # Ver 3
     ]
     gpu_canon_izq = pipeline.vertex_list_indexed(4, GL_TRIANGLES, indices_canon)
     gpu_canon_izq.position = pos_vertices_izq
@@ -179,8 +180,6 @@ if __name__ == "__main__":
             v_y = np.random.uniform(1.0, 2.0)
             p_grande = Particle([0.8, -0.7], 3.0, [v_x, v_y], [0.0 ,-4.0])
             controller.particles_gran.append(p_grande)
-
-
 
 
     # Aquí se actualiza todo el sistema de partículas
