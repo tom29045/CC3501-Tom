@@ -29,10 +29,12 @@ class Controller(Window):
 
 #CAMARA mejorada con métodos corregidos
 class MyCam(FreeCamera):
-    def __init__(self, position=np.array([0, 0, 0]), camera_type="perspective"):
+    def __init__(self, position=np.array([0, 0, 0]), camera_type="perspective", width=800, height=600):
         super().__init__(position, camera_type)
         self.direction = np.array([0, 0, 0], dtype=np.float32)
         self.speed = 2
+        self.width = width
+        self.height = height
 
     def get_view(self):
         """Devuelve matriz de vista con shape (16,) compatible con Pyglet"""
@@ -103,7 +105,7 @@ if __name__ == "__main__":
     pipeline = ShaderProgram(vertex_shader, fragment_shader)
     root = os.path.dirname(__file__)
 
-    cam = MyCam([0,0,2])
+    cam = MyCam([0,0,2], width=800, height=600)
 
     world = SceneGraph(cam)
 
