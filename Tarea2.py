@@ -133,11 +133,9 @@ if __name__ == "__main__":
     cuerpo = Model(shapes.Square["position"], body, index_data=shapes.Square["indices"])
 
     world.add_node("head", attach_to="Player", mesh=cabeza, texture=Tileset, pipeline=pipeline)
-    world["head"]["scale"] = [1, 1.3, 1]
-    world["head"]["translate"] = tr.translate(0.0, 0.6, 0.0)
+    world["head"]["transform"] = tr.matmul([tr.translate(0.0, 0.6, 0.0), tr.scale(1, 1.3, 1)])
     world.add_node("body", attach_to="Player", mesh=cuerpo, texture=Tileset, pipeline=pipeline)
-    world["body"]["scale"] = [1, 1.3, 1]
-    world["body"]["translate"] = tr.translate(0.0, -0.4, 0.0)
+    world["body"]["transform"] = tr.matmul([tr.translate(0.0, -0.4, 0.0), tr.scale(1, 1.3, 1)])
 
 
     @controller.event
@@ -155,6 +153,7 @@ if __name__ == "__main__":
     #CAMARA vista en aux5
     @controller.event
     def on_key_press(symbol, modifiers):
+        global player_vel, zoom_vel
         if symbol == key.W:
             zoom_vel = 1.0
         if symbol == key.S:
@@ -167,6 +166,7 @@ if __name__ == "__main__":
 
     @controller.event
     def on_key_release(symbol, modifiers):
+        global player_vel, zoom_vel
         if symbol == key.W or symbol == key.S:
             zoom_vel = 0.0
 
@@ -176,11 +176,10 @@ if __name__ == "__main__":
 
     #Informacion que se actualiza con el tiempo
     def update(dt):
-        global player_x
+        global player_x, player_vel, zoom_vel
         player_x += player_vel * dt
-        world["Player"]["translate"] = tr.translate(player_x, 0.0, 0.0)
-        world["Fondo"]["translate"] = tr.translate(player_x*0.8, 0.0, -2.0)
-        world["Fondo"]["scale"] = [20, 20, 1]
+        world["Player"]["transform"] = tr.translate(player_x, 0.0, 0.0)
+        world["Fondo"]["transform"] = tr.matmul([tr.translate(player_x*0.8, 0.0, -2.0), tr.scale(20, 20, 1)])
         cam.position[2] += zoom_vel * dt
         cam.position[0] = player_x
         cam.focus[0] = player_x
