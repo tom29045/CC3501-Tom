@@ -89,9 +89,9 @@ if __name__ == "__main__":
 
     world = SceneGraph(cam)
 
-    Tileset = Texture(root, image = "/TileSet.png", minFilterMode=GL_NEAREST, maxFilterMode=GL_NEAREST)
-    background = Texture(root, image = "/backgroundColor.png", minFilterMode=GL_NEAREST, maxFilterMode=GL_NEAREST, sWrapMode=GL_REPEAT, tWrapMode=GL_REPEAT)
-    background2 = Texture(root, image = "/backgroundShapes.png", minFilterMode=GL_NEAREST, maxFilterMode=GL_NEAREST, sWrapMode=GL_REPEAT, tWrapMode=GL_REPEAT)
+    Tileset = Texture(root + "/TileSet.png", minFilterMode=GL_NEAREST, maxFilterMode=GL_NEAREST)
+    background = Texture(root + "/backgroundColor.png", minFilterMode=GL_NEAREST, maxFilterMode=GL_NEAREST, sWrapMode=GL_REPEAT, tWrapMode=GL_REPEAT)
+    background2 = Texture(root + "/backgroundShapes.png", minFilterMode=GL_NEAREST, maxFilterMode=GL_NEAREST, sWrapMode=GL_REPEAT, tWrapMode=GL_REPEAT)
 
     aW = Tileset.width
     aH = Tileset.height
@@ -108,8 +108,9 @@ if __name__ == "__main__":
 
     paisaje = Model(shapes.Square["position"], fondo, index_data=shapes.Square["indices"])
     world.add_node("root")
-    world.add_node("Fondo", attach_to="root", mesh=fondo, texture = background, pipeline=pipeline)
-    world.add_node("Fondo2", attach_to="root", mesh=fondo, texture = background2, pipeline=pipeline)
+    world.add_node("Fondo", attach_to="root")
+    world.add_node("Color", attach_to="Fondo", mesh=paisaje, texture = background, pipeline=pipeline)
+    world.add_node("Hierba", attach_to="Fondo", mesh=paisaje, texture = background2, pipeline=pipeline)
     world.add_node("Player", attach_to="root")
 
 
@@ -148,38 +149,43 @@ if __name__ == "__main__":
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         world.draw()
         
-
+    player_x = 0.0
+    player_vel = 0.0
+    zoom_vel = 0.0
     #CAMARA vista en aux5
     @controller.event
     def on_key_press(symbol, modifiers):
         if symbol == key.W:
-            cam.direction[0] = 1
+            zoom_vel = 1.0
         if symbol == key.S:
-            cam.direction[0] = -1
+            zoom_vel = -1.0
 
         if symbol == key.A:
-            cam.direction[1] = 1
+            player_vel = -3.0
         if symbol == key.D:
-            cam.direction[1] = -1
+            player_vel = 3.0
 
     @controller.event
     def on_key_release(symbol, modifiers):
         if symbol == key.W or symbol == key.S:
-            cam.direction[0] = 0
+            zoom_vel = 0.0
 
         if symbol == key.A or symbol == key.D:
-            cam.direction[1] = 0
+            player_vel = 0.0
 
 
     #Informacion que se actualiza con el tiempo
     def update(dt):
+        global player_x
+        player_x += player_vel * dt
+        world["Player"]["translate"] = tr.translate(player_x, 0.0, 0.0)
+        world["Fondo"]["translate"] = tr.translate(player_x*0.8, 0.0, -2.0)
+        world["Fondo"]["scale"] = [20, 20, 1]
+        cam.position[2] += zoom_vel * dt
+        cam.position[0] = player_x
+        cam.focus[0] = player_x
+        cam.update()
         world.update()
-        cam.time_update(dt)
-
-        c_pos = cam.position.copy()
-        c_pos[1] = 0
-
-        controller.time += dt
 
     clock.schedule_interval(update,1/60)
     run()
