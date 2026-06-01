@@ -147,8 +147,6 @@ if __name__ == "__main__":
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         pipeline.use()
-        pipeline["view"] = cam.get_view()
-        pipeline["proyection"] = cam.get_projection()
         world.draw()
         
     player_x = 0.0
