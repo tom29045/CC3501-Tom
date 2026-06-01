@@ -27,14 +27,31 @@ class Controller(Window):
         self.light_mode = False
 
 
-#CAMARA definida en una clase
+#CAMARA mejorada con métodos corregidos
 class MyCam(FreeCamera):
     def __init__(self, position=np.array([0, 0, 0]), camera_type="perspective"):
         super().__init__(position, camera_type)
-        self.direction = np.array([0,0,0])
+        self.direction = np.array([0, 0, 0], dtype=np.float32)
         self.speed = 2
 
+    def get_view(self):
+        """Devuelve matriz de vista con shape (16,) compatible con Pyglet"""
+        lookAt_matrix = tr.lookAt(self.position, self.focus, np.array([0, 1, 0], dtype=np.float32))
+        return np.reshape(lookAt_matrix, (16,), order="F")
+
+    def get_projection(self):
+        """Devuelve matriz de proyección con shape (16,) compatible con Pyglet"""
+        perspective_matrix = tr.identity()
+        if self.type == "perspective":
+            perspective_matrix = tr.perspective(90, self.width / self.height, 0.01, 100)
+        elif self.type == "orthographic":
+            depth = self.position - self.focus
+            depth = np.linalg.norm(depth)
+            perspective_matrix = tr.ortho(-(self.width/self.height) * depth, (self.width/self.height) * depth, -1 * depth, 1 * depth, 0.01, 100)
+        return np.reshape(perspective_matrix, (16,), order="F")
+
     def time_update(self, dt):
+        """Actualiza la cámara basada en input del usuario"""
         self.update()
         dir = self.direction[0]*self.forward + self.direction[1]*self.right
         dir_norm = np.linalg.norm(dir)
