@@ -164,7 +164,7 @@ if __name__ == "__main__":
     cuerpo = Model(shapes.Square["position"], body, index_data=shapes.Square["indices"])
 
     world.add_node("head", attach_to="Player", mesh=cabeza, texture=Tileset, pipeline=pipeline, )
-    world["head"]["transform"] = tr.matmul([tr.translate(0.0, 0.6, -0.1), tr.scale(0.5, 0.8, 1)])
+    world["head"]["transform"] = tr.matmul([tr.translate(0.0, 0.6, -0.01), tr.scale(0.5, 0.8, 1)])
     world.add_node("body", attach_to="Player", mesh=cuerpo, texture=Tileset, pipeline=pipeline)
     world["body"]["transform"] = tr.matmul([tr.translate(0.0, -0.01, 0.0), tr.scale(0.5, 0.8, 1)])
     world.add_node("Plataforma 1", attach_to="Plataformas")
