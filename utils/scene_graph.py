@@ -184,10 +184,10 @@ class SceneGraph():
             if self.camera is not None:
 
                 if "u_view" in current_pipeline.uniforms:
-                    current_pipeline["u_view"] = self.camera.get_view()
-
+                    current_pipeline["u_view"] = self.camera.get_view().flatten("F").tolist()
                 if "u_projection" in current_pipeline.uniforms:
-                    current_pipeline["u_projection"] = self.camera.get_projection()
+                    current_pipeline["u_projection"] = self.camera.get_projection().flatten("F").tolist()
+
 
             if current_node["mesh"] is not None:
                 """
@@ -212,7 +212,7 @@ class SceneGraph():
                 """
                 Setup de Mesh
                 """                
-                current_pipeline["u_model"] = np.reshape(self.transformations[dst], (16, 1), order="F")
+                current_pipeline["u_model"] = self.transformations[dst].flatten("F").tolist()
                 current_node["mesh"].draw(current_node["mode"], current_node["cull_face"])
 
                 if textured:
