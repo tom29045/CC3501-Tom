@@ -122,3 +122,25 @@ if __name__ == "__main__":
     pipeline = ShaderProgram(vertex_shader, fragment_shader)
 
     cam = MyCam([0.0, 8.0, 30.0])
+    
+    focos_estadio = [
+        19.5, 12.0, 13.5,
+        -19.5, 12.0, 13.5,
+        19.5, 12.0, -13.5,
+        -19.5, 12.0, -13.5
+    ]
+
+    pipeline["u_lightPositions"] = focos_estadio
+
+    @controller.event
+    def on_draw():
+        controller.clear()
+        glClearColor(0.1, 0.1, 0.1, 1.0)
+        glEnable(GL_DEPTH_TEST)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        pipeline.use()
+        world.draw()
+
+    clock.schedule_interval(update,1/60)
+    run()
