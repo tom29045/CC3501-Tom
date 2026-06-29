@@ -5,6 +5,7 @@ from pyglet.gl import *
 from pyglet.app import run
 from pyglet import math
 from pyglet import clock
+import pyglet
 
 import sys, os
 import numpy as np
@@ -90,47 +91,56 @@ if __name__ == "__main__":
     out vec4 outColor;
 
     void main() {
-        vec3 N = normalize(fragNormal);
-        vec3 V = normalize(u_viewPos - fragPosition);
-    
-        vec3 totalDiffuse = vec3(0.0);
-        vec3 totalSpecular = vec3(0.0);
-    
+    vec3 N = normalize(fragNormal);
+    vec3 V = normalize(u_viewPos - fragPosition);
 
-        for(int i = 0; i < 4; i++) {
-            vec3 L = normalize(u_lightPositions[i] - fragPosition);
-        
-            float diff = max(dot(N, L), 0.0);
-            totalDiffuse += diff * u_lightColor;
-        
-            vec3 H = normalize(L + V);
-            float spec = pow(max(dot(N, H), 0.0), Ns);
-            totalSpecular += spec * u_lightColor * Ks;
-        }
-    
-        vec4 texColor = texture(u_texture, fragTexCoord);
-    
-        vec3 ambientFactor = Ka * u_lightColor;
-        vec3 finalColor = (ambientFactor + totalDiffuse) * texColor.rgb + totalSpecular;
-    
-        outColor = vec4(finalColor, texColor.a);
+    vec3 totalDiffuse = vec3(0.0);
+    vec3 totalSpecular = vec3(0.0);
+    vec3 L0 = normalize(u_lightPositions[0] - fragPosition);
+    totalDiffuse += max(dot(N, L0), 0.0) * u_lightColor;
+    totalSpecular += pow(max(dot(N, normalize(L0 + V)), 0.0), Ns) * u_lightColor * Ks;
+
+    vec3 L1 = normalize(u_lightPositions[1] - fragPosition);
+    totalDiffuse += max(dot(N, L1), 0.0) * u_lightColor;
+    totalSpecular += pow(max(dot(N, normalize(L1 + V)), 0.0), Ns) * u_lightColor * Ks;
+
+    vec3 L2 = normalize(u_lightPositions[2] - fragPosition);
+    totalDiffuse += max(dot(N, L2), 0.0) * u_lightColor;
+    totalSpecular += pow(max(dot(N, normalize(L2 + V)), 0.0), Ns) * u_lightColor * Ks;
+
+    vec3 L3 = normalize(u_lightPositions[3] - fragPosition);
+    totalDiffuse += max(dot(N, L3), 0.0) * u_lightColor;
+    totalSpecular += pow(max(dot(N, normalize(L3 + V)), 0.0), Ns) * u_lightColor * Ks;
+
+    vec4 texColor = texture(u_texture, fragTexCoord);
+    vec3 ambientFactor = Ka * u_lightColor;
+    vec3 finalColor = (ambientFactor + totalDiffuse) * texColor.rgb + totalSpecular;
+
+    outColor = vec4(finalColor, texColor.a);
     }
     """
 
     vertex_shader = Shader(vert_source, "vertex")
     fragment_shader = Shader(frag_source, "fragment")
     pipeline = ShaderProgram(vertex_shader, fragment_shader)
+    root = os.path.dirname(__file__)
 
     cam = MyCam([0.0, 8.0, 30.0])
     
     focos_estadio = [
-        19.5, 12.0, 13.5,
-        -19.5, 12.0, 13.5,
-        19.5, 12.0, -13.5,
-        -19.5, 12.0, -13.5
+        [19.5, 12.0, 13.5],
+        [-19.5, 12.0, 13.5],
+        [19.5, 12.0, -13.5],
+        [-19.5, 12.0, -13.5]
     ]
 
-    pipeline["u_lightPositions"] = focos_estadio
+    with open(os.path.join(root, "stadium.obj"), 'r') as f:
+        estadio = pyglet.model.load("stadium.obj", file=f)
+
+    pipeline["u_lightPositions[0]"] = focos_estadio[0]
+    pipeline["u_lightPositions[1]"] = focos_estadio[1]
+    pipeline["u_lightPositions[2]"] = focos_estadio[2]
+    pipeline["u_lightPositions[3]"] = focos_estadio[3]
 
     @controller.event
     def on_draw():
@@ -140,7 +150,7 @@ if __name__ == "__main__":
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         pipeline.use()
-        world.draw()
+        estadio.draw()
 
     clock.schedule_interval(update,1/60)
     run()
