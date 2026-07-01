@@ -113,14 +113,25 @@ if __name__ == "__main__":
 
 
     cielo_tex = Texture(root + "/estadio/sky01.png")
-    
+    pasto = Texture(root + "/images.jpeg")
+
     cielo_mat = Material(ambient=[1.0, 1.0, 1.0], diffuse=[0.0, 0.0, 0.0], specular=[0.0, 0.0, 0.0])
 
     cielo_transform = np.matmul(tr.translate(0.0, 10.0, -60.0), tr.uniformScale(200.0))
     cielo2_transform = np.matmul(tr.translate(0.0, 10.0, 60.0), tr.uniformScale(200.0))
-    
+    cielo3_transform = np.matmul(tr.translate(-30.0, 10.0, 0.0), tr.uniformScale(200.0))
+    cielo4_transform = np.matmul(tr.translate(30.0, 10.0, 0.0), tr.uniformScale(200.0))
+    cielo5_transform = np.matmul(tr.translate(0.0, 20.0, 0.0), tr.uniformScale(200.0))
+    pasto_transform = np.matmul(tr.translate(0.0, -1.0, 0.0), tr.uniformScale(200.0))
+
+
     world.add_node("cielo", "root", mesh=quad, texture=cielo_tex, material=cielo_mat, pipeline=pipeline, transform=cielo_transform)
-    world.add_node("cielo2", "root", mesh=quad, texture=cielo_tex, material=cielo_mat, pipeline=pipeline, transform=cielo2_transform)
+    world.add_node("cielo2", "root", mesh=quad, texture=cielo_tex, material=cielo_mat, pipeline=pipeline, transform=cielo2_transform, rotation = [0, np.pi, 0])
+    world.add_node("cielo3", "root", mesh=quad, texture=cielo_tex, material=cielo_mat, pipeline=pipeline, transform = cielo3_transform)
+    world.add_node("cielo4", "root", mesh=quad, texture=cielo_tex, material=cielo_mat, pipeline=pipeline, transform = cielo4_transform, rotation = [0, np.pi, 0])
+    world.add_node("cielo4", "root", mesh=quad, texture=cielo_tex, material=cielo_mat, pipeline=pipeline, transform = cielo5_transform, rotation = [np.pi, 0, 0])
+
+    world.add_node("pasto", "root", mesh = quad, texture = pasto, material = material, pipeline = pipeline, transform = pasto_transform, rotation = [-np.pi, 0, 0])
 
 
     texturas_estadio = {}
@@ -274,8 +285,6 @@ if __name__ == "__main__":
     # Apuntamos la cámara
         cam.focus = cam.position + cam.forward
     
-    # Nuestro detector de mentiras
-        print(f"Posición: X={cam.position[0]:.1f}, Y={cam.position[1]:.1f}, Z={cam.position[2]:.1f} | W: {controller.W}")
     
         world.update()
 
