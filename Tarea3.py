@@ -75,7 +75,7 @@ class MyCam(FreeCamera):
 
 if __name__ == "__main__":
 
-    controller = Controller(1920, 1080, "Tarea 3")
+    controller = Controller(2560, 1440, "Tarea 3")
     #controller.set_exclusive_mouse(True)
     root = os.path.dirname(__file__)
     cam = MyCam([0.0, 1.0, 15.0])
@@ -270,7 +270,7 @@ if __name__ == "__main__":
         controller.time += dt
         cam.update()
     
-        velocidad = 10.0 * dt
+        velocidad = 8.0 * dt
     
     # Leemos directamente desde el ADN del controlador
         if controller.W: cam.position += cam.forward * velocidad
