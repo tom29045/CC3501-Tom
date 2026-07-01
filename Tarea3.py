@@ -19,7 +19,7 @@ from utils.helpers import init_axis, mesh_from_file
 from utils.camera import FreeCamera
 from utils.scene_graph import SceneGraph
 from utils import shapes
-from utils.drawables import Texture, Model
+from utils.drawables import Texture, Model, Material, DirectionalLight, PointLight, SpotLight
 from grafica import lighting_shaders as light
 
 #Controla la ventana
@@ -61,27 +61,27 @@ if __name__ == "__main__":
     with open(root +  "/shaders/textured_mesh_lit.frag") as f:
         color_fragment_source_code = f.read()
     
-    pipeline = ShaderProgram(color_vertex_source_code, color_fragment_source_code)
+    pipeline = ShaderProgram(
+    Shader(color_vertex_source_code, "vertex"),
+    Shader(color_fragment_source_code, "fragment")
+    )
 
-    with open(root + "/estadio/untitled.obj") as f:
-        estadio = f.read()
-
-    with open(root + "/Pikachu/Pikachu.obj") as r:
-        pikachu = r.read()
-
+    estadio_mesh = mesh_from_file(root + "/estadio/untitled.obj")[0]["mesh"]
+    pikachu_mesh = mesh_from_file(root + "/Pikachu/Pikachu.obj")[0]["mesh"]
+    quad = Model(shapes.Square["position"], index_data=shapes.Square["indices"], normal_data=shapes.Square["normal"])
+    cube = Model(shapes.Cube["position"], index_data=shapes.Cube["indices"], normal_data=shapes.Cube["normal"])
+    material = Material(ambient=[0.1, 0.1, 0.1], diffuse=[0.8, 0.8, 0.8], specular=[1.0, 1.0, 1.0], shininess=32.0)
 
     world = SceneGraph(cam)
 
     world.add_node("root")
-    world.add_node("estadio", "root")
-    for part in mesh_from_file(estadio):
-        world.add_node(
-            part["id"],
-            attach_to="estadio",
-            mesh = part["mesh"],
-            pipeline = pipeline,
-            light = 
-        )
+    world.add_node("stadium")
+    world.add_node("estadio", "stadium", pipeline = pipeline, mesh = estadio_mesh, material = material, scale = [1, 1, 1])
+    world.add_node("luces", "stadium", pipeline = pipeline)
+    world.add_node("luz 1", "luces", light = DirectionalLight(), pipeline = pipeline)
+    world.add_node("pikachu", "stadium", pikachu_mesh, pipeline, material = material)
+
+    
 
     @controller.event
     def on_draw():
@@ -93,5 +93,9 @@ if __name__ == "__main__":
         pipeline.use()
         world.draw()
 
+    def update(dt):
+        controller.time += dt
+
+        world.update()
     clock.schedule_interval(update,1/60)
     run()
